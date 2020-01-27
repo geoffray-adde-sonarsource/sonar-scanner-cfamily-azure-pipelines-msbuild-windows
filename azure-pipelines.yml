@@ -15,7 +15,7 @@ jobs:
       configMode: 'manual'
       cliProjectKey: 'geoffray-azure-msbuild-windows-test'
       cliProjectName: 'geoffray-azure-msbuild-windows-test'
-      cliSources: 'src'
+      cliSources: 'sonar_scanner_example'
       extraProperties: 'sonar.cfamily.build-wrapper-output=build_wrapper_output_directory'
   - pwsh: |
       rm build-wrapper-win-x86 -Recurse -Force -ErrorAction SilentlyContinue
@@ -52,7 +52,7 @@ jobs:
       configMode: 'manual'
       cliProjectKey: 'geoffray-azure-msbuild-windows-test'
       cliProjectName: 'geoffray-azure-msbuild-windows-test'
-      cliSources: 'src'
+      cliSources: 'sonar_scanner_example'
       extraProperties: 'sonar.cfamily.build-wrapper-output=build_wrapper_output_directory'
   - pwsh: |
       rm build-wrapper-win-x86 -Recurse -Force -ErrorAction SilentlyContinue
