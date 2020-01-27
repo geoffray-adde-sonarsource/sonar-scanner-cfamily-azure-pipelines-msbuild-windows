@@ -1,0 +1,64 @@
+trigger:
+- master
+
+jobs:
+- job: BuildWindowsWithSonarQube
+  displayName: Build for Windows With SonarQube
+  dependsOn: [] # by specifying an empty array, this stage doesn't depend on the stage before it
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: SonarQubePrepare@4
+    inputs:
+      SonarQube: 'Peach'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: 'geoffray-azure-msbuild-windows-test'
+      cliProjectName: 'geoffray-azure-msbuild-windows-test'
+      cliSources: 'src'
+      extraProperties: 'sonar.cfamily.build-wrapper-output=build_wrapper_output_directory'
+  - pwsh: |
+      rm build-wrapper-win-x86 -Recurse -Force -ErrorAction SilentlyContinue
+      rm build-wrapper-win-x86 -Force -ErrorAction SilentlyContinue
+      $path = ".\build-wrapper-win-x86.zip"
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+      (New-Object System.Net.WebClient).DownloadFile("https://peach.sonarsource.com/static/cpp/build-wrapper-win-x86.zip", $path)
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      [System.IO.Compression.ZipFile]::ExtractToDirectory($path, ".")
+      del $path
+    displayName: Install buildwrapper
+  - bash: |
+      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $MsbuildPath sonar_scanner_example.sln /t:rebuild
+    displayName: Compile project in build wrapper
+  - task: SonarQubeAnalyze@4
+
+- job: BuildWindowsWithSonarCloud
+  displayName: Build for Windows With SonarCloud
+  dependsOn: [] # by specifying an empty array, this stage doesn't depend on the stage before it
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+  - task: SonarCloudPrepare@1
+    inputs:
+      SonarCloud: 'SonarCloud'
+      organization: 'geoffray-adde-sonarsource-github'
+      scannerMode: 'CLI'
+      configMode: 'manual'
+      cliProjectKey: 'geoffray-azure-msbuild-windows-test'
+      cliProjectName: 'geoffray-azure-msbuild-windows-test'
+      cliSources: 'src'
+      extraProperties: 'sonar.cfamily.build-wrapper-output=build_wrapper_output_directory'
+  - pwsh: |
+      rm build-wrapper-win-x86 -Recurse -Force -ErrorAction SilentlyContinue
+      rm build-wrapper-win-x86 -Force -ErrorAction SilentlyContinue
+      $path = ".\build-wrapper-win-x86.zip"
+      [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+      (New-Object System.Net.WebClient).DownloadFile("https://peach.sonarsource.com/static/cpp/build-wrapper-win-x86.zip", $path)
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      [System.IO.Compression.ZipFile]::ExtractToDirectory($path, ".")
+      del $path
+    displayName: Install buildwrapper
+  - bash: |
+      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $MsbuildPath sonar_scanner_example.sln /t:rebuild
+    displayName: Compile project in build wrapper
+  - task: SonarCloudAnalyze@1
