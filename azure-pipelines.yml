@@ -34,10 +34,7 @@ jobs:
       installPackageId: 'vswhere'
   - pwsh: |
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
-      if ($path) {
-        & $path $args
-      }
-      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory MSBuild.exe sonar_scanner_example.sln /t:rebuild
+      & build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $path sonar_scanner_example.sln /t:rebuild
     displayName: Compile project in build wrapper
   - task: SonarQubeAnalyze@4
 
@@ -67,12 +64,12 @@ jobs:
       [System.IO.Compression.ZipFile]::ExtractToDirectory($path, ".")
       del $path
     displayName: Install buildwrapper
+  - task: ChocolateyCommand@0
+    inputs:
+      command: 'install'
+      installPackageId: 'vswhere'
   - pwsh: |
-      Install-Module VSSetup -Scope CurrentUser
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
-      if ($path) {
-        & $path $args
-      }
-      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory MSBuild.exe sonar_scanner_example.sln /t:rebuild
+      & build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $path sonar_scanner_example.sln /t:rebuild
     displayName: Compile project in build wrapper
   - task: SonarCloudAnalyze@1
