@@ -28,7 +28,7 @@ jobs:
       del $path
     displayName: Install buildwrapper
   - bash: |
-      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $MsbuildPath sonar_scanner_example.sln /t:rebuild
+      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory MSBuild.exe sonar_scanner_example.sln /t:rebuild
     displayName: Compile project in build wrapper
   - task: SonarQubeAnalyze@4
 
@@ -59,6 +59,6 @@ jobs:
       del $path
     displayName: Install buildwrapper
   - bash: |
-      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $MsbuildPath sonar_scanner_example.sln /t:rebuild
+      build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory MSBuild.exe sonar_scanner_example.sln /t:rebuild
     displayName: Compile project in build wrapper
   - task: SonarCloudAnalyze@1
