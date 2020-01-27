@@ -28,6 +28,7 @@ jobs:
       del $path
     displayName: Install buildwrapper
   - pwsh: |
+      Install-Module VSSetup -Scope CurrentUser
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
       if ($path) {
         & $path $args
@@ -63,6 +64,7 @@ jobs:
       del $path
     displayName: Install buildwrapper
   - pwsh: |
+      Install-Module VSSetup -Scope CurrentUser
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
       if ($path) {
         & $path $args
