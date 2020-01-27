@@ -27,8 +27,12 @@ jobs:
       [System.IO.Compression.ZipFile]::ExtractToDirectory($path, ".")
       del $path
     displayName: Install buildwrapper
+  - pwsh: 
+  - task: ChocolateyCommand@0
+    inputs:
+      command: 'install'
+      installPackageId: 'vswhere'
   - pwsh: |
-      Install-Module VSSetup -Scope CurrentUser
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
       if ($path) {
         & $path $args
