@@ -4,7 +4,7 @@ trigger:
 jobs:
 - job: BuildWindowsWithSonarQube
   displayName: Build for Windows With SonarQube
-  dependsOn: [] # by specifying an empty array, this stage doesn't depend on the stage before it
+  dependsOn: []
   pool:
     vmImage: 'windows-latest'
   steps:
@@ -18,8 +18,6 @@ jobs:
       cliSources: 'sonar_scanner_example'
       extraProperties: 'sonar.cfamily.build-wrapper-output=build_wrapper_output_directory'
   - pwsh: |
-      rm build-wrapper-win-x86 -Recurse -Force -ErrorAction SilentlyContinue
-      rm build-wrapper-win-x86 -Force -ErrorAction SilentlyContinue
       $path = ".\build-wrapper-win-x86.zip"
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
       (New-Object System.Net.WebClient).DownloadFile("https://peach.sonarsource.com/static/cpp/build-wrapper-win-x86.zip", $path)
@@ -31,8 +29,8 @@ jobs:
   - task: ChocolateyCommand@0
     inputs:
       command: 'install'
-      installPackageId: 'vswhere'
-  - pwsh: |
+      installPackageId: 'vswhere'  # needed to find msbuild.exe
+  - pwsh: | # note: it is not possible to use an msbuild task as we need the build command line
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
       & build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $path sonar_scanner_example.sln /t:rebuild
     displayName: Compile project in build wrapper
@@ -40,7 +38,7 @@ jobs:
 
 - job: BuildWindowsWithSonarCloud
   displayName: Build for Windows With SonarCloud
-  dependsOn: [] # by specifying an empty array, this stage doesn't depend on the stage before it
+  dependsOn: []
   pool:
     vmImage: 'windows-latest'
   steps:
@@ -55,8 +53,6 @@ jobs:
       cliSources: 'sonar_scanner_example'
       extraProperties: 'sonar.cfamily.build-wrapper-output=build_wrapper_output_directory'
   - pwsh: |
-      rm build-wrapper-win-x86 -Recurse -Force -ErrorAction SilentlyContinue
-      rm build-wrapper-win-x86 -Force -ErrorAction SilentlyContinue
       $path = ".\build-wrapper-win-x86.zip"
       [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
       (New-Object System.Net.WebClient).DownloadFile("https://peach.sonarsource.com/static/cpp/build-wrapper-win-x86.zip", $path)
@@ -67,8 +63,8 @@ jobs:
   - task: ChocolateyCommand@0
     inputs:
       command: 'install'
-      installPackageId: 'vswhere'
-  - pwsh: |
+      installPackageId: 'vswhere' # needed to find msbuild.exe
+  - pwsh: | # note: it is not possible to use an msbuild task as we need the build command line
       $path = vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
       & build-wrapper-win-x86/build-wrapper-win-x86-64 --out-dir build_wrapper_output_directory $path sonar_scanner_example.sln /t:rebuild
     displayName: Compile project in build wrapper
